@@ -1,55 +1,151 @@
-﻿using System;
+﻿// Program.cs
+using System;
+using System.Collections.Generic; // Diperlukan untuk menggunakan List
 
 namespace ProyekParfum
 {
     class Program
     {
+
+        // Dideklarasikan sebagai 'static' agar bisa diakses di seluruh metode dalam kelas Program.
+        static List<KoleksiParfum> daftarKoleksi = new List<KoleksiParfum>();
+
         static void Main(string[] args)
         {
-            Console.WriteLine("===== Demonstrasi Konsep OOP pada Tema Parfum =====");
+            Console.WriteLine("======================================");
+            Console.WriteLine("  Selamat Datang di Aplikasi Koleksi Parfum");
+            Console.WriteLine("======================================");
             Console.WriteLine();
 
-            // 1. CLASS & OBJECT
-            Console.WriteLine("--- 1. Membuat Object dari Class ---");
-            Parfum parfumReguler = new Parfum("Sauvage", "Dior");
-            ParfumEdisiTerbatas parfumLangka = new ParfumEdisiTerbatas("Aventus Absolu", "Creed", 2023);
-            Aroma aromaSauvage = new Aroma("Bergamot", "Sichuan Pepper", "Ambroxan");
-            Console.WriteLine("Object parfumReguler, parfumLangka, dan aromaSauvage berhasil dibuat.");
-            Console.WriteLine();
 
-            // 2. INHERITANCE & POLYMORPHISM (OVERRIDING)
-            Console.WriteLine("--- 2. Demonstrasi Inheritance & Polymorphism (Overriding) ---");
-            // Kedua objek memanggil method 'Deskripsi()', tetapi outputnya berbeda
-            // sesuai dengan implementasi di masing-masing kelas.
-            parfumReguler.Deskripsi();
-            parfumLangka.Deskripsi();
-            Console.WriteLine();
+            while (true)
+            {
+                TampilkanMenu();
+                string pilihan = Console.ReadLine();
 
-            // 3. COMPOSITION
-            // Membuat objek 'KoleksiParfum' yang tersusun dari objek 'Parfum' dan 'Aroma'.
-            Console.WriteLine("--- 3. Demonstrasi Composition ---");
-            KoleksiParfum koleksiSaya = new KoleksiParfum(parfumReguler, aromaSauvage, 100);
-            koleksiSaya.TampilkanDetailKoleksi();
-            Console.WriteLine();
+                switch (pilihan)
+                {
+                    case "1":
+                        TambahParfumBaru();
+                        break;
+                    case "2":
+                        TampilkanSemuaKoleksi();
+                        break;
+                    case "3":
+                        Console.WriteLine("Terima kasih telah menggunakan aplikasi. Sampai jumpa!");
+                        return; // Keluar dari aplikasi
+                    default:
+                        Console.WriteLine("Pilihan tidak valid. Silakan coba lagi.");
+                        TekanUntukLanjut();
+                        break;
+                }
+            }
+        }
 
-            // 4. POLYMORPHISM (OVERLOADING)
-            Console.WriteLine("--- 4. Demonstrasi Polymorphism (Overloading) ---");
-            // Memanggil dua versi method 'Semprot' dengan nama yang sama.
-            koleksiSaya.Semprot();       // Memanggil versi tanpa parameter
-            koleksiSaya.Semprot(3);      // Memanggil versi dengan parameter int
-            Console.WriteLine();
+        static void TampilkanMenu()
+        {
+            Console.Clear(); 
+            Console.WriteLine("--- MENU UTAMA ---");
+            Console.WriteLine("1. Tambah Parfum Baru ke Koleksi");
+            Console.WriteLine("2. Tampilkan Semua Koleksi Parfum");
+            Console.WriteLine("3. Keluar");
+            Console.Write("Masukkan pilihan Anda (1-3): ");
+        }
 
-            // 5. ENCAPSULATION & DATA HIDING
-            // Kita tidak bisa langsung mengakses field 'merk' dari kelas Parfum karena bersifat 'private'.
-            Console.WriteLine("--- 5. Demonstrasi Encapsulation & Data Hiding ---");
-            Console.WriteLine($"Nama Awal: {parfumReguler.Nama}");
-            parfumReguler.Nama = "Sauvage Elixir"; 
-            Console.WriteLine($"Nama Baru: {parfumReguler.Nama}"); 
-            Console.WriteLine($"Merk: {parfumReguler.Merk}");
-            Console.WriteLine();
+        static void TambahParfumBaru()
+        {
+            Console.Clear();
+            Console.WriteLine("--- TAMBAH PARFUM BARU ---");
 
-            Console.WriteLine("Tekan tombol apa saja untuk keluar...");
+            Parfum parfumBase; 
+
+            Console.Write("Apakah ini edisi terbatas? (y/n): ");
+            string jenis = Console.ReadLine().ToLower();
+
+            Console.Write("Masukkan Nama Parfum: ");
+            string nama = Console.ReadLine();
+
+            Console.Write("Masukkan Merk Parfum: ");
+            string merk = Console.ReadLine();
+
+            if (jenis == "y")
+            {
+                Console.Write("Masukkan Tahun Rilis: ");
+                // Validasi input agar hanya angka yang diterima
+                if (int.TryParse(Console.ReadLine(), out int tahun))
+                {
+                    // Membuat objek dari kelas turunan (Inheritance)
+                    parfumBase = new ParfumEdisiTerbatas(nama, merk, tahun);
+                }
+                else
+                {
+                    Console.WriteLine("Input tahun tidak valid. Kembali ke menu utama.");
+                    TekanUntukLanjut();
+                    return;
+                }
+            }
+            else
+            {
+                // Membuat objek dari kelas dasar
+                parfumBase = new Parfum(nama, merk);
+            }
+
+            Console.WriteLine("\n--- Masukkan Detail Aroma ---");
+            Console.Write("Top Note: ");
+            string topNote = Console.ReadLine();
+            Console.Write("Middle Note: ");
+            string middleNote = Console.ReadLine();
+            Console.Write("Base Note: ");
+            string baseNote = Console.ReadLine();
+
+            // Membuat objek Aroma (untuk Composition)
+            Aroma aroma = new Aroma(topNote, middleNote, baseNote);
+
+            Console.Write("\nMasukkan Volume (ml): ");
+            if (int.TryParse(Console.ReadLine(), out int volume))
+            {
+                // Membuat objek KoleksiParfum yang "menggabungkan" objek Parfum dan Aroma
+                KoleksiParfum koleksiBaru = new KoleksiParfum(parfumBase, aroma, volume);
+                daftarKoleksi.Add(koleksiBaru);
+
+                Console.WriteLine("\nParfum baru berhasil ditambahkan ke koleksi!");
+            }
+            else
+            {
+                Console.WriteLine("Input volume tidak valid. Kembali ke menu utama.");
+            }
+
+            TekanUntukLanjut();
+        }
+
+        static void TampilkanSemuaKoleksi()
+        {
+            Console.Clear();
+            Console.WriteLine("--- SEMUA KOLEKSI PARFUM ANDA ---");
+
+            if (daftarKoleksi.Count == 0)
+            {
+                Console.WriteLine("Koleksi Anda masih kosong.");
+            }
+            else
+            {
+                int nomor = 1;
+                foreach (var koleksi in daftarKoleksi)
+                {
+                    Console.WriteLine($"\n--- Parfum #{nomor} ---");
+                    // Jika objeknya adalah ParfumEdisiTerbatas, method Deskripsi() yang di-override yang akan terpanggil.
+                    koleksi.TampilkanDetailKoleksi();
+                    nomor++;
+                }
+            }
+            TekanUntukLanjut();
+        }
+
+        // Metode bantuan untuk menjeda layar
+        static void TekanUntukLanjut()
+        {
+            Console.WriteLine("\nTekan tombol apa saja untuk melanjutkan...");
             Console.ReadKey();
-        } 
+        }
     }
 }
